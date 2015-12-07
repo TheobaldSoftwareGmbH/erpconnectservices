@@ -1,0 +1,26 @@
+// http://help.theobald-software.com/ERPConnect-Services-EN/default.aspx#pageid=sap-validation-in-nintex-forms
+// include http://static.theobald-software.com/tEcs/4.10.2/theobald.ecs.js
+// webpage loaded
+NWF$(document).ready(function () {
+    tEcs.setJquery(NWF$);
+    var $ = NWF$,
+        // number input
+        tsInput = $('#' + field_input),
+        // description output
+        tsInputDescription = $('#' + field_output);    
+        tsInput.on('blur', function () {
+        tEcs.executeXql({
+            data: tEcs.format("SELECT TOP 2 KUNNR, NAME1 FROM KNA1 WHERE (KUNNR LIKE '%{0}') ", tsInput.val())
+        }).done(function (data) {
+            if (data.result.rows.length === 1) {
+                var firstRow = data.result.rows[0];
+                tsInputDescription.val(tEcs.format('{0} - {1}', firstRow.KUNNR, firstRow.NAME1));
+            } else {
+                tsInputDescription.val('No direct match!');
+            }
+        }).fail(function (data, data2) {
+            console.log(data, data2);
+            tsInputDescription.val('Communication error, please see console');
+        });
+    });
+});
